@@ -1,211 +1,168 @@
-<! DOCTYPE html>
+<!DOCTYPE html>
 <html lang="mr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>विश्वम डेअरी - ग्राहक केंद्र</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- QR Code Library -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Hind:wght@400; 600; 700&display=swap" rel="stylesheet">
-<style>
-body { font-family: 'Hind', sans-serif; background-color: #f1f5f9; color: #1e293b; }
-.card { background: white; border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
-.gradient-bg { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
-.input-qty { border: 1px solid #e2e8f0; border-radius: 8px; width: 60px; text-align: center; font-weight: bold; padding: 4px; outline: none; }
-.input-qty:focus { border-color: #3b82f6; ring: 2px solid #3b82f6; }
-/* Modal Style */
-#qrModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 50; align-items: center; justify-content: center; padding: 20px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>विश्वम डेअरी - स्मार्ट हब</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Hind', sans-serif; background: #f0f4f8; }
+        .tab-btn.active { border-bottom: 4px solid #1e3a8a; color: #1e3a8a; }
+        .card { background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .hidden { display: none; }
+    </style>
 </head>
-<body class="pb-20">
+<body class="pb-24">
 
-<!-- Header Section -->
-<div class="gradient-bg text-white p-6 pb-24 text-center rounded-b-[50px] relative">
-<h1 class="text-3xl font-black mb-1">विश्वम डेअरी</h1>
-<p class="text-blue-100 text-sm font-bold opacity-80 italic">"शुद्धता आणि विश्वासाचे दुसरे नाव"</p>
+    <div class="bg-blue-900 text-white p-6 text-center rounded-b-[40px] shadow-2xl">
+        <h1 class="text-2xl font-black tracking-tight">VISHVAM DAIRY</h1>
+        <p class="text-blue-200 text-sm mb-4">शुद्धता आणि विश्वास</p>
+        <div class="flex justify-center space-x-6 bg-blue-800/50 p-2 rounded-full w-max mx-auto">
+            <button onclick="switchTab('customer')" id="custTab" class="tab-btn active px-4 py-1 font-bold text-sm transition-all">ग्राहक</button>
+            <button onclick="checkAdmin()" id="adminTab" class="tab-btn px-4 py-1 font-bold text-sm transition-all">मालक</button>
+        </div>
+    </div>
 
-<!-- QR Toggle Button -->
-<button onclick="showQR()" class="absolute top-6 right-6 bg-white/20 p-2 rounded-full backdrop-blur-md">
-<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
-</button>
-</div>
+    <div id="customerView" class="max-w-md mx-auto p-4 space-y-6">
+        <div class="card p-6 mt-4 border-t-8 border-blue-600">
+            <h2 class="font-black text-xl mb-4 text-gray-800">🛒 ताजी उत्पादने</h2>
+            
+            <div class="space-y-4">
+                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <div>
+                        <span class="block font-bold text-gray-700">🧀 ताजे पनीर</span>
+                        <span class="text-xs text-blue-600 font-bold">₹ 350 / Kg</span>
+                    </div>
+                    <input type="number" id="qtyP" value="0" min="0" class="w-16 p-2 border-2 border-blue-100 rounded-xl text-center font-bold outline-none focus:border-blue-500" oninput="calcTotal()">
+                </div>
+                
+                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <div>
+                        <span class="block font-bold text-gray-700">🍶 ताजे दही</span>
+                        <span class="text-xs text-blue-600 font-bold">₹ 80 / Ltr</span>
+                    </div>
+                    <input type="number" id="qtyD" value="0" min="0" class="w-16 p-2 border-2 border-blue-100 rounded-xl text-center font-bold outline-none focus:border-blue-500" oninput="calcTotal()">
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t-2 border-dashed border-gray-200">
+                <div class="flex justify-between text-2xl font-black mb-6 text-gray-900">
+                    <span>एकूण बिल:</span> <span id="dispTotal" class="text-blue-700">₹ 0</span>
+                </div>
+                
+                <div class="space-y-3">
+                    <input type="text" id="custName" placeholder="तुमचे पूर्ण नाव" class="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                    <input type="text" id="custLoc" placeholder="डिलिव्हरीचा पत्ता" class="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                </div>
+                
+                <button onclick="placeOrder()" class="w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-black py-4 rounded-2xl shadow-lg transform active:scale-95 transition-all flex justify-center items-center gap-2">
+                    ✅ ऑर्डर बुक करा
+                </button>
+            </div>
+        </div>
+    </div>
 
-<div class="max-w-md mx-auto -mt-16 px-4 space-y-6 relative z-10">
+    <div id="adminView" class="hidden max-w-md mx-auto p-4 space-y-6">
+        <div class="card p-6 mt-4 bg-blue-50 border-2 border-blue-200">
+            <h2 class="font-black text-xl mb-2 text-blue-900">📊 बिझनेस डॅशबोर्ड</h2>
+            <p class="text-sm text-blue-700 mb-6">तुमच्या ऑर्डर्स इथून मॅनेज करा.</p>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <a href="तुमच्या_GOOGLE_SHEET_ची_LINK_इथे_टाका" target="_blank" class="bg-white p-5 rounded-2xl shadow-sm text-center border-2 border-white hover:border-blue-400 transition-all">
+                    <span class="text-3xl mb-2 block">📋</span>
+                    <span class="text-xs font-black text-gray-700">सर्व ऑर्डर्स</span>
+                </a>
+                <button onclick="window.location.reload()" class="bg-white p-5 rounded-2xl shadow-sm text-center border-2 border-white">
+                    <span class="text-3xl mb-2 block">🔄</span>
+                    <span class="text-xs font-black text-gray-700">रिफ्रेश करा</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
-<!-- Today's Quality Report -->
-<div class="card p-5 border-l-8 border-blue-600">
-<div class="flex justify-between items-center mb-3">
-<h2 class="font-black text-slate-800 flex items-center gap-2">
-<span class="text-blue-600">📊</span> आजची शुद्धता
-</h2>
-<span class="text-[10px] bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-bold">दिनांक: आज</span>
-</div>
-<div class="grid grid-cols-3 gap-3">
-<div class="bg-slate-50 p-2 rounded-xl text-center border border-slate-100">
-<p class="text-[9px] text-slate-500 font-bold uppercase">Milk Fat</p>
-<p class="text-lg font-black text-blue-800">4.5%</p>
-</div>
-<div class="bg-slate-50 p-2 rounded-xl text-center border border-slate-100">
-<p class="text-[9px] text-slate-500 font-bold uppercase">SNF</p>
-<p class="text-lg font-black text-blue-800">8.5%</p>
-</div>
-<div class="bg-green-50 p-2 rounded-xl text-center border border-green-100">
-<p class="text-[9px] text-green-600 font-bold uppercase">Purity</p>
-<p class="text-lg font-black text-green-700">100%</p>
-</div>
-</div>
-</div>
+    <script>
+        // --- महत्त्वाचे बदल इथं करा ---
+        const scriptURL = 'तुमची_APPS_SCRIPT_URL_इथे_टाका'; // उदा. https://script.google.com/macros/s/.../exec
+        const myWhatsApp = '9198XXXXXXXX'; // तुमचा नंबर 91 सह
+        const adminPass = '1234'; // तुमचा मालक पासवर्ड
+        // -----------------------
 
-<!-- Products / Order Form -->
-<div class="card p-6">
-<h2 class="font-black text-xl mb-6 text-slate-800 flex items-center gap-2">🛒 ताजी उत्पादने</h2>
+        function switchTab(tab) {
+            const cv = document.getElementById('customerView');
+            const av = document.getElementById('adminView');
+            const ct = document.getElementById('custTab');
+            const at = document.getElementById('adminTab');
 
-<div class="space-y-5">
-<!-- Paneer -->
-<div class="flex justify-between items-center group">
-<div class="flex items-center gap-4">
-<div class="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-2xl shadow-inner">🧀</ div>
-<div>
-<p class="font-black text-slate-800">ताजे पनीर</p>
-<p class="text-xs font-bold text-slate-400">₹350 / Kg</p>
-</div>
-</div>
-<div class="flex items-center gap-2 bg-slate-50 p-1 rounded-lg">
-<input type="number" id="qtyP" value="0" min="0" class="input-qty bg-transparent" oninput="updateTotal()">
-<span class="text-[10px] font-black text-slate-400 pr-2 uppercase">Kg</span>
-</div>
-</div>
+            if(tab === 'customer') {
+                cv.classList.remove('hidden');
+                av.classList.add('hidden');
+                ct.classList.add('active');
+                at.classList.remove('active');
+            } else {
+                cv.classList.add('hidden');
+                av.classList.remove('hidden');
+                at.classList.add('active');
+                ct.classList.remove('active');
+            }
+        }
 
-<!-- Curd -->
-<div class="flex justify-between items-center group">
-<div class="flex items-center gap-4">
-<div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-2xl shadow-inner">🍶</div>
-<div>
-<p class="font-black text-slate-800">घट्ट दही</p>
-<p class="text-xs font-bold text-slate-400">₹80 / Litre</p>
-</div>
-</div>
-<div class="flex items-center gap-2 bg-slate-50 p-1 rounded-lg">
-<input type="number" id="qtyD" value="0" min="0" class="input-qty bg-transparent" oninput="updateTotal()">
-<span class="text-[10px] font-black text-slate-400 pr-2 uppercase">Ltr</span>
-</div>
-</div>
+        function checkAdmin() {
+            let p = prompt("पासवर्ड टाका:");
+            if(p === adminPass) {
+                switchTab('admin');
+            } else {
+                alert("चुकीचा पासवर्ड!");
+            }
+        }
 
-<!-- Ghee -->
-<div class="flex justify-between items-center group">
-<div class="flex items-center gap-4">
-<div class="w-12 h-12 bg-yellow-100 rounded-2xl flex items-center justify-center text-2xl shadow-inner">🧈</div>
-<div>
-<p class="font-black text-slate-800">शुद्ध तूप</p>
-<p class="text-xs font-bold text-slate-400">₹700 / Kg</p>
-</div>
-</div>
-<div class="flex items-center gap-2 bg-slate-50 p-1 rounded-lg">
-<input type="number" id="qtyG" value="0" min="0" class="input-qty bg-transparent" oninput="updateTotal()">
-<span class="text-[10px] font-black text-slate-400 pr-2 uppercase">Kg</span>
-</div>
-</div>
-</div>
+        function calcTotal() {
+            let pQty = document.getElementById('qtyP').value || 0;
+            let dQty = document.getElementById('qtyD').value || 0;
+            let total = (pQty * 350) + (dQty * 80);
+            document.getElementById('dispTotal').innerText = "₹ " + total;
+        }
 
-<!-- Billing & Details -->
-<div class="mt-8 pt-6 border-t border-dashed border-slate-200">
-<div class="flex justify-between items-center mb-6">
-<p class="font-bold text-slate-500">एकूण देय रक्कम:</p>
-<p class="text-3xl font-black text-blue-900" id="totalBill">₹ 0</p>
-</div>
+        async function placeOrder() {
+            const name = document.getElementById('custName').value;
+            const loc = document.getElementById('custLoc').value;
+            const p = document.getElementById('qtyP').value;
+            const d = document.getElementById('qtyD').value;
+            const total = document.getElementById('dispTotal').innerText;
 
-<div class="space-y-3 mb-6">
-<input type="text" id="custName" placeholder="तुमचे पूर्ण नाव" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
-<input type="text" id="custLoc" placeholder="पत्ता (सोसायटी / गल्ली)" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
-</div>
+            if(!name || !loc) {
+                alert("कृपया नाव आणि पत्ता भरा!");
+                return;
+            }
 
-<button onclick="orderViaWhatsApp()" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl shadow-xl shadow-green-100 flex items-center justify-center gap-3 active:scale-95 transition-transform">
-<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1. 588-3.849-1.588-5.946 0-6.556 5.332-11.888 11.888-11.888 3.176 0 6.161 1.237 8.404 3.48s3.48 5.228 3.48 8.404c0 6.556-5.332 11.888-11.888 11.888-2.01 0-3.983-.51-5.733-1.478l-6.25 1.703zm6.3-4.045l.36.214c1.52. 905 3.274 1.382 5.077 1.382 5.485 0 9.946-4.461 9.946-9.946 0-2.653-1.033-5.147-2.908-7. 022-1.875-1.875-4.37-2.908-7.023-2.908-5.485 0-9.945 4.461-9.945 9.946 0 2.015.611 3.987 1.764 5.656l.235.341-1.054 3.849 3.948-1.076z"/></svg>
-WhatsApp वर ऑर्डर करा
-</button>
-</div>
-</div>
+            if(p == 0 && d == 0) {
+                alert("कमीत कमी एक वस्तू निवडा!");
+                return;
+            }
 
-<!-- Footer -->
-<div class="text-center py-6">
-<p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-4">विश्वम डेअरी पुणे • १.०</p>
-</div>
-</div>
+            // 1. Google Sheet ला डेटा पाठवणे
+            const orderData = {
+                name: name,
+                location: loc,
+                order: "पनीर: " + p + "kg, दही: " + d + "L",
+                total: total
+            };
 
-<!-- QR Modal -->
-<div id="qrModal" onclick="closeQR()">
-<div class="bg-white p-8 rounded-[30px] text-center max-w-xs w-full" onclick="event. stopPropagation()">
-<h3 class="font-black text-slate-800 mb-2">आमचा QR Code</h3>
-<p class="text-xs text-slate-400 mb-6 font-bold uppercase">ऑर्डर करण्यासाठी स्कॅन करा</p>
-<div id="qrcode" class="flex justify-center mb-6 p-4 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200"></div>
-<button onclick="closeQR()" class="bg-slate-100 text-slate-600 font-bold px-6 py-2 rounded-full text-sm">बंद करा</button>
-</div>
-</div>
+            fetch(scriptURL, { 
+                method: 'POST', 
+                mode: 'no-cors', // Error 400 टाळण्यासाठी महत्त्वाचे
+                cache: 'no-cache',
+                body: JSON.stringify(orderData) 
+            }).then(() => {
+                console.log("Sheet updated");
+            }).catch(err => console.error("Sheet error:", err));
 
-<script>
-const rates = { p: 350, d: 80, g: 700 };
-
-function updateTotal() {
-const p = parseFloat(document.getElementById('qtyP').value) || 0;
-const d = parseFloat(document.getElementById('qtyD').value) || 0;
-const g = parseFloat(document.getElementById('qtyG').value) || 0;
-const total = (p * rates.p) + (d * rates.d) + (g * rates.g);
-document.getElementById('totalBill').innerText = `₹ ${total}`;
-}
-
-function orderViaWhatsApp() {
-const name = document.getElementById('custName').value;
-const loc = document.getElementById('custLoc').value;
-const p = document.getElementById('qtyP').value;
-const d = document.getElementById('qtyD').value;
-const g = document.getElementById('qtyG').value;
-const total = document.getElementById('totalBill').innerText;
-const myNumber = "918805223290"; // तुमचा नंबर इथे बदला
-
-if(!name || (p==0 && d==0 && g==0)) {
-alert("कृपया तुमचे नाव लिहा आणि किमान एक वस्तू निवडा!");
-return;
-}
-
-let message = `*नवीन ऑर्डर - विश्वम डेअरी*%0A`;
-message += `---------------------------%0A`;
-message += `👤 *ग्राहक:* ${name}%0A`;
-message += `📍 *पत्ता:* ${loc}%0A%0A`;
-if(p > 0) message += `🧀 *पनीर:* ${p} Kg%0A`;
-if(d > 0) message += `🍶 *दही:* ${d} L%0A`;
-if(g > 0) message += `🧈 *तूप:* ${g} Kg%0A`;
-message += `---------------------------%0A`;
-message += `💰 *एकूण बिल:* ${total}%0A%0A`;
-message += `कृपया ऑर्डर कन्फर्म करा!`;
-
-window.open(`https://wa.me/${myNumber}?text=${message}`, '_blank');
-}
-
-// QR Code Logic
-let qrGenerated = false;
-function showQR() {
-const modal = document.getElementById('qrModal');
-modal.style.display = 'flex';
-if (!qrGenerated) {
-new QRCode(document.getElementById("qrcode"), {
-text: window.location.href,
-width: 200,
-height: 200,
-colorDark : "#1e3a8a",
-colorLight : "#f8fafc",
-correctLevel : QRCode.CorrectLevel.H
-});
-qrGenerated = true;
-}
-}
-
-function closeQR() {
-document.getElementById('qrModal').style.display = 'none';
-}
-
-window.onload = updateTotal;
-</script>
+            // 2. WhatsApp मेसेज तयार करणे
+            let msg = `*नवीन ऑर्डर - विश्वम डेअरी*%0A--------------------------%0A*नाव:* ${name}%0A*पत्ता:* ${loc}%0A*ऑर्डर:* पनीर ${p}kg, दही ${d}L%0A*एकूण बिल:* ${total}%0A--------------------------%0A_लवकरच डिलिव्हरी मिळेल!_`;
+            
+            window.open(`https://wa.me/${myWhatsApp}?text=${msg}`, '_blank');
+        }
+    </script>
 </body>
 </html>
 
