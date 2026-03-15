@@ -1,197 +1,143 @@
 <!DOCTYPE html>
 <html lang="mr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>विश्वम डेअरी - Smart Shop</title>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISHVAM DAIRY</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #f1f5f9; font-family: sans-serif; }
-        .card { background: white; border-radius: 16px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .hidden { display: none; }
-        .btn-primary { background: #1e40af; color: white; padding: 14px; border-radius: 12px; width: 100%; font-weight: bold; }
-        .btn-outline { border: 2px solid #1e40af; color: #1e40af; padding: 12px; border-radius: 12px; width: 100%; font-weight: bold; }
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px; }
+        body { background: #f8fafc; font-family: system-ui; }
+        .card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .btn-primary { background: #1e40af; color: white; padding: 14px; border-radius: 8px; width: 100%; font-weight: 700; transition: 0.2s; }
+        .btn-primary:active { transform: scale(0.98); }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; items-center; justify-content: center; z-index: 99; padding: 20px; }
     </style>
 </head>
-<body class="p-4 pb-10">
+<body class="p-4">
 
-    <div class="bg-blue-800 text-white p-6 rounded-2xl text-center mb-4 shadow-lg" onclick="adminTouch()">
-        <h1 class="text-2xl font-black italic tracking-tight">VISHVAM DAIRY</h1>
-        <p id="rateStatus" class="text-[10px] font-bold text-yellow-400">CONNECTING...</p>
-    </div>
+    <header class="bg-blue-800 text-white p-6 rounded-2xl text-center mb-4 shadow-md" onclick="adminLogin()">
+        <h1 class="text-2xl font-black italic tracking-tighter">VISHVAM DAIRY</h1>
+        <p id="status" class="text-[10px] font-bold text-yellow-400 mt-1 uppercase tracking-widest">System Offline</p>
+    </header>
 
-    <div id="customerView">
-        <div class="card p-4">
-            <h2 class="font-bold text-gray-700 mb-4 border-b pb-2 text-sm uppercase">🛒 Products</h2>
-            <div id="itemsList" class="space-y-4">
-                <script>
-                    const products = [
-                        { name: "दूध (Milk)", units: ["L", "ml"] },
-                        { name: "पनीर (Paneer)", units: ["kg", "gm"] },
-                        { name: "दही (Curd)", units: ["kg", "gm", "L"] },
-                        { name: "तूप (Ghee)", units: ["kg", "gm"] },
-                        { name: "लस्सी (Lassi)", units: ["ml", "Unit"] },
-                        { name: "ताक (Buttermilk)", units: ["L", "ml"] }
-                    ];
-                    document.write(products.map(p => `
-                        <div class="flex items-center gap-2 border-b border-gray-50 pb-2">
-                            <span class="w-1/3 text-[13px] font-bold text-gray-800">${p.name}</span>
-                            <input type="number" class="w-1/4 p-2 border rounded qty bg-gray-50" data-name="${p.name}" placeholder="0" oninput="updateTotal()">
-                            <select class="w-1/4 p-2 border rounded unit text-xs font-bold bg-white" onchange="updateTotal()">
-                                ${p.units.map(u => `<option value="${u}">${u}</option>`).join('')}
-                            </select>
-                        </div>`).join(''));
-                </script>
-            </div>
+    <div id="shop">
+        <div class="card">
+            <h3 class="text-xs font-bold text-gray-500 mb-3 border-b pb-2 uppercase tracking-wider">Select Products</h3>
+            <div id="items" class="space-y-3"></div>
         </div>
 
-        <div class="card p-4 bg-blue-50 border border-blue-100">
-            <div class="flex justify-between items-center border-b border-blue-200 pb-2 mb-2">
-                <span class="font-black text-blue-900">Total Bill:</span>
-                <span id="finalTotal" class="text-2xl font-black text-blue-900">₹ 0.00</span>
+        <div class="card bg-blue-50 border border-blue-100">
+            <div class="flex justify-between items-center mb-2">
+                <span class="font-bold text-blue-900">Total Bill:</span>
+                <span id="bill" class="text-2xl font-black text-blue-900">₹ 0.00</span>
             </div>
-            <input type="text" id="coupon" placeholder="Coupon Code" class="w-full p-2 border rounded text-center font-bold uppercase text-sm" oninput="updateTotal()">
-            <div id="discountInfo" class="mt-2 text-center text-green-600 font-bold text-xs hidden"></div>
+            <input id="coupon" type="text" placeholder="Coupon Code" class="w-full p-2 border rounded-lg text-center font-bold uppercase text-sm mb-1" oninput="calc()">
+            <div id="promo" class="text-center text-green-600 font-bold text-[10px] hidden"></div>
         </div>
 
-        <div class="card p-4 space-y-3">
-            <input type="text" id="cust_name" placeholder="तुमचे नाव" class="w-full p-3 border rounded-xl outline-none text-sm">
-            <input type="number" id="cust_phone" placeholder="मोबाईल नंबर" class="w-full p-3 border rounded-xl outline-none text-sm">
-            <textarea id="cust_loc" placeholder="पत्ता" class="w-full p-3 border rounded-xl outline-none text-sm"></textarea>
+        <div class="card space-y-3">
+            <input id="name" type="text" placeholder="तुमचे नाव" class="w-full p-3 border rounded-lg text-sm outline-none">
+            <input id="phone" type="number" placeholder="मोबाईल नंबर" class="w-full p-3 border rounded-lg text-sm outline-none">
+            <textarea id="addr" placeholder="पत्ता" class="w-full p-3 border rounded-lg text-sm outline-none h-20"></textarea>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
-            <button id="codBtn" onclick="confirmOrder('COD')" class="btn-outline">💵 COD</button>
-            <button id="upiBtn" onclick="confirmOrder('UPI')" class="btn-primary">📱 Pay Now</button>
+            <button onclick="order('COD')" class="border-2 border-blue-800 text-blue-800 font-bold p-3 rounded-lg">💵 COD</button>
+            <button onclick="order('UPI')" class="btn-primary">📱 PAY NOW</button>
         </div>
     </div>
 
-    <div id="paymentModal" class="modal hidden">
-        <div class="bg-white rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl">
-            <h2 class="font-bold text-xl mb-1 text-blue-800 italic text-sm">SCAN TO PAY</h2>
-            <p id="modalAmt" class="text-3xl font-black text-gray-900 mb-4">₹ 0.00</p>
-            <div class="bg-white p-3 rounded-2xl border-2 border-blue-100 inline-block mb-4">
-                <img id="qrImg" src="" alt="QR" class="w-48 h-48 mx-auto">
+    <div id="payMod" class="modal hidden">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-xs text-center">
+            <h2 id="payAmt" class="text-3xl font-black mb-4">₹ 0.00</h2>
+            <div class="border-4 border-blue-50 p-2 rounded-2xl inline-block mb-4">
+                <img id="qr" class="w-48 h-48 mx-auto" src="">
             </div>
-            <p class="text-[9px] font-bold text-gray-400 mb-4 uppercase">UPI: omkartodkar51@ybl</p>
-            <button id="paidBtn" onclick="finalSubmit('UPI')" class="btn-primary w-full bg-green-600 mb-3 shadow-lg">पेमेंट केले, ऑर्डर द्या</button>
-            <button onclick="closeModal()" class="text-gray-400 text-xs font-bold underline">रद्द करा</button>
+            <button onclick="submit('UPI')" class="btn-primary bg-green-600 mb-3">✅ पेमेंट केले, ऑर्डर द्या</button>
+            <button onclick="closeMod()" class="text-gray-400 text-xs font-bold">CANCEL</button>
         </div>
     </div>
 
-    <div id="adminView" class="hidden text-center p-8 card border-2 border-blue-600">
-        <h2 class="font-bold text-xl mb-4">मालक डॅशबोर्ड</h2>
-        <a id="sheetLink" href="#" target="_blank" class="block bg-black text-white p-4 rounded-xl font-bold">📊 उघडा शीट</a>
-        <button onclick="location.reload()" class="mt-4 underline text-gray-400 text-sm font-bold">Log Out</button>
+    <div id="admin" class="hidden text-center card py-10">
+        <a id="sLink" href="#" target="_blank" class="bg-black text-white p-4 rounded-xl font-bold inline-block w-full">📊 OPEN SHEET</a>
+        <button onclick="location.reload()" class="mt-4 text-xs underline">Back</button>
     </div>
 
     <script>
-        // --- खालच्या ३ गोष्टी नीट भरा ---
-        const scriptURL ='https://script.google.com/macros/s/AKfycbyhFm6B_kAIU4kM4C4qZf3lxvG4crvjqOrJp6D76ka1tCSVjwhLcZ_QZfFEavIbjOLzrg/execा'; 
-        const myWhatsApp = '918805223290';
-        const myUPI = 'omkartodkar51@ybl';
-        const mySheetLink = 'https://docs.google.com/spreadsheets/u/0/d/1616EczZGBg1gpj83v4GkQUm3IAvLmhTX2VqBinKnjzo/htmlview';
-        
-        let settings = { rates: {}, coupons: {} };
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzQtWNBhdd3z-g5STXfbYH4oXtIAimGEXpAKWriwBp_XAuCNPlKRmJTJ6ez7sSw9CmvFg/exec';
+        const myWA = '918805223290', myUPI = 'omkartodkar51@ybl', mySheet = 'https://docs.google.com/spreadsheets/u/0/d/1616EczZGBg1gpj83v4GkQUm3IAvLmhTX2VqBinKnjzo/htmlview';
+        let config = { rates: {}, coupons: {} };
 
-        async function fetchSettings() {
+        const products = [
+            { n: "दूध (Milk)", u: ["L", "ml"] }, { n: "पनीर (Paneer)", u: ["kg", "gm"] },
+            { n: "दही (Curd)", u: ["kg", "gm"] }, { n: "तूप (Ghee)", u: ["kg", "gm"] },
+            { n: "लस्सी (Lassi)", u: ["ml", "Unit"] }, { n: "ताक (Buttermilk)", u: ["L", "ml"] }
+        ];
+
+        document.getElementById('items').innerHTML = products.map(p => `
+            <div class="flex items-center gap-2 border-b border-gray-50 pb-2">
+                <span class="w-1/3 text-xs font-bold text-gray-700">${p.n}</span>
+                <input type="number" class="w-1/4 p-2 border rounded qty text-sm text-center" data-n="${p.n}" placeholder="0" oninput="calc()">
+                <select class="w-1/4 p-2 border rounded unit text-xs font-bold">
+                    ${p.u.map(u => `<option value="${u}">${u}</option>`).join('')}
+                </select>
+            </div>`).join('');
+
+        async function init() {
             try {
-                const response = await fetch(scriptURL);
-                settings = await response.json();
-                document.getElementById('rateStatus').innerText = "✅ ONLINE";
-                document.getElementById('rateStatus').style.color = "#4ade80";
-            } catch (e) { 
-                document.getElementById('rateStatus').innerText = "❌ SERVER ERROR"; 
-                document.getElementById('rateStatus').style.color = "#f87171";
-            }
+                const r = await fetch(scriptURL);
+                config = await r.json();
+                document.getElementById('status').innerText = "✅ Online & Synced";
+            } catch(e) { document.getElementById('status').innerText = "❌ Connection Error"; }
         }
 
-        function updateTotal() {
-            let subtotal = 0;
+        function calc() {
+            let total = 0;
             document.querySelectorAll('.qty').forEach((q, i) => {
-                let val = parseFloat(q.value) || 0;
-                let unit = document.querySelectorAll('.unit')[i].value;
-                let rate = settings.rates[q.dataset.name] || 0;
-                if (unit === "gm" || unit === "ml") val /= 1000;
-                subtotal += (val * rate);
+                let v = parseFloat(q.value) || 0;
+                let u = document.querySelectorAll('.unit')[i].value;
+                let r = config.rates[q.dataset.n] || 0;
+                if(u === "gm" || u === "ml") v /= 1000;
+                total += (v * r);
             });
-            let couponCode = document.getElementById('coupon').value.toUpperCase();
-            let dPercent = settings.coupons[couponCode] || 0;
-            let dAmt = (subtotal * dPercent) / 100;
-            let final = subtotal - dAmt;
-            document.getElementById('finalTotal').innerText = "₹ " + final.toFixed(2);
-            const dDiv = document.getElementById('discountInfo');
-            if(dPercent > 0) {
-                dDiv.classList.remove('hidden');
-                dDiv.innerText = `Coupon Applied: ${dPercent}% Off (-₹${dAmt.toFixed(2)})`;
-            } else { dDiv.classList.add('hidden'); }
+            let cp = document.getElementById('coupon').value.toUpperCase(), d = config.coupons[cp] || 0;
+            let final = total - (total * d / 100);
+            document.getElementById('bill').innerText = `₹ ${final.toFixed(2)}`;
+            const pr = document.getElementById('promo');
+            if(d > 0) { pr.innerText = `Applied: ${d}% Off`; pr.classList.remove('hidden'); }
+            else { pr.classList.add('hidden'); }
         }
 
-        function confirmOrder(type) {
-            const name = document.getElementById('cust_name').value.trim();
-            const phone = document.getElementById('cust_phone').value.trim();
-            const amt = document.getElementById('finalTotal').innerText.replace('₹ ', '');
-            if(!name || phone.length < 10 || parseFloat(amt) <= 0) return alert("सर्व माहिती नीट भरा!");
-
-            if(type === 'UPI') {
-                document.getElementById('modalAmt').innerText = "₹ " + amt;
-                document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=${myUPI}%26pn=Vishvam%20Dairy%26am=${amt}%26cu=INR`;
-                document.getElementById('paymentModal').classList.remove('hidden');
-            } else {
-                if(confirm("COD ऑर्डर कन्फर्म करायची?")) finalSubmit('COD');
-            }
+        function order(t) {
+            const n = document.getElementById('name').value, p = document.getElementById('phone').value;
+            if(!n || p.length < 10 || parseFloat(document.getElementById('bill').innerText.slice(2)) <= 0) return alert("सर्व माहिती भरा!");
+            if(t === 'UPI') {
+                const a = document.getElementById('bill').innerText.slice(2);
+                document.getElementById('payAmt').innerText = "₹ " + a;
+                document.getElementById('qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=${myUPI}%26pn=VishvamDairy%26am=${a}%26cu=INR`;
+                document.getElementById('payMod').classList.remove('hidden');
+            } else { if(confirm("Confirm COD Order?")) submit('COD'); }
         }
 
-        async function finalSubmit(type) {
-            const btn = type === 'UPI' ? document.getElementById('paidBtn') : document.getElementById('codBtn');
-            const originalText = btn.innerText;
-            btn.disabled = true; btn.innerText = "Saving Order...";
-
-            const finalBill = document.getElementById('finalTotal').innerText;
-            const orderID = "V-" + Math.floor(1000 + Math.random() * 9000);
-            let summary = [];
+        async function submit(mode) {
+            const bill = document.getElementById('bill').innerText;
+            const id = "V-" + Math.floor(1000 + Math.random() * 9000);
+            let s = [];
             document.querySelectorAll('.qty').forEach((q, i) => {
-                if(parseFloat(q.value) > 0) summary.push(`${q.dataset.name}: ${q.value}${document.querySelectorAll('.unit')[i].value}`);
+                if(parseFloat(q.value) > 0) s.push(`${q.dataset.n}: ${q.value}${document.querySelectorAll('.unit')[i].value}`);
             });
 
-            const data = {
-                orderID: orderID, name: document.getElementById('cust_name').value, 
-                phone: document.getElementById('cust_phone').value, location: document.getElementById('cust_loc').value,
-                coupon: document.getElementById('coupon').value, itemsSummary: summary.join(", "), 
-                finalBill: finalBill, paymentMode: type
-            };
+            const d = { orderID: id, name: document.getElementById('name').value, phone: document.getElementById('phone').value, location: document.getElementById('addr').value, coupon: document.getElementById('coupon').value, itemsSummary: s.join(", "), finalBill: bill, paymentMode: mode };
 
             try {
-                // १. आधी डेटा सेव्ह करा
-                await fetch(scriptURL, {method: 'POST', body: JSON.stringify(data)});
-                
-                // २. मगच व्हॉट्सॲप मेसेज तयार करून तिकडे पाठवा
-                let msg = `*नवीन ऑर्डर (${type}) - विश्वम डेअरी*%0A--------------------------%0A*ID:* ${orderID}%0A*नाव:* ${data.name}%0A*ऑर्डर:* ${data.itemsSummary}%0A*बिल:* ${finalBill}%0A*पेमेंट:* ${type === 'UPI' ? '📱 Paid (UPI)' : '💵 COD'}%0A*पत्ता:* ${data.location}`;
-                
-                window.location.href = `https://wa.me/${myWhatsApp}?text=${msg}`;
-            } catch(e) {
-                alert("नेटवर्क एरर! पुन्हा प्रयत्न करा.");
-                btn.disabled = false; btn.innerText = originalText;
-            }
+                fetch(scriptURL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(d)});
+                let m = `*VISHVAM DAIRY ORDER*%0A-----------------%0AID: ${id}%0ANAME: ${d.name}%0AORDER: ${d.itemsSummary}%0A*BILL: ${bill}*%0AMODE: ${mode}%0AADDR: ${d.location}`;
+                window.location.href = `https://wa.me/${myWA}?text=${m}`;
+            } catch(e) { alert("Error!"); }
         }
 
-        function closeModal() { document.getElementById('paymentModal').classList.add('hidden'); }
-        
-        let clicks = 0;
-        function adminTouch() { 
-            clicks++; 
-            if(clicks === 5) { 
-                if(prompt("Admin Password:") === "1234") { 
-                    document.getElementById('customerView').classList.add('hidden'); 
-                    document.getElementById('adminView').classList.remove('hidden'); 
-                    document.getElementById('sheetLink').href = mySheetLink;
-                } 
-            } 
-            setTimeout(() => { clicks = 0; }, 2000); 
-        }
-        
-        fetchSettings();
+        function closeMod() { document.getElementById('payMod').classList.add('hidden'); }
+        let c = 0; function adminLogin() { c++; if(c === 5 && prompt("Pass:") === "1234") { document.getElementById('shop').classList.add('hidden'); document.getElementById('admin').classList.remove('hidden'); document.getElementById('sLink').href = mySheet; } setTimeout(()=>c=0, 2000); }
+        init();
     </script>
 </body>
 </html>
