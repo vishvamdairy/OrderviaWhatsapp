@@ -10,18 +10,18 @@
         .card { background: white; border-radius: 16px; padding: 15px; margin-bottom: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .hidden { display: none; }
         .btn-primary { background: #1e40af; color: white; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; }
-        .tab-btn { padding: 10px; font-weight: bold; border-bottom: 3px solid transparent; width: 50%; }
-        .tab-active { border-bottom: 3px solid #1e40af; color: #1e40af; background: #eff6ff; }
+        .tab-btn { padding: 12px; font-weight: bold; width: 50%; }
+        .tab-active { background: #1e40af; color: white; border-radius: 10px; }
     </style>
 </head>
-<body class="p-4 pb-10">
+<body class="p-4">
 
     <div class="bg-blue-800 text-white p-6 rounded-2xl text-center mb-4 shadow-lg" onclick="adminTouch()">
         <h1 class="text-2xl font-black">VISHVAM DAIRY</h1>
-        <p id="rateStatus" class="text-[10px] font-bold text-yellow-400">दर लोड होत आहेत...</p>
+        <p id="rateStatus" class="text-[10px] font-bold text-yellow-400 uppercase">दर लोड होत आहेत...</p>
     </div>
 
-    <div class="flex mb-4 bg-white rounded-xl p-1 shadow-sm">
+    <div class="flex mb-4 bg-white rounded-xl p-1 shadow-sm border">
         <button id="shopTab" onclick="switchTab('shop')" class="tab-btn tab-active">🛒 ऑर्डर</button>
         <button id="trackTab" onclick="switchTab('track')" class="tab-btn">🔍 ट्रॅक</button>
     </div>
@@ -29,7 +29,7 @@
     <div id="customerView">
         <div class="card">
             <h2 class="font-bold text-gray-700 mb-4 border-b pb-2">उत्पादने निवडा</h2>
-            <div class="space-y-4">
+            <div id="itemsList" class="space-y-4">
                 <script>
                     const products = [
                         { name: "दूध (Milk)", units: ["L", "ml"] },
@@ -40,118 +40,142 @@
                         { name: "ताक (Buttermilk)", units: ["L", "ml"] }
                     ];
                     document.write(products.map(p => `
-                        <div class="flex items-center gap-2 border-b pb-2">
+                        <div class="flex items-center gap-2 border-b border-gray-50 pb-2">
                             <span class="w-1/3 text-sm font-bold">${p.name}</span>
                             <input type="number" class="w-1/4 p-2 border rounded-lg qty bg-gray-50" data-name="${p.name}" placeholder="0" oninput="updateTotal()">
-                            <select class="w-1/4 p-2 border rounded-lg unit" onchange="updateTotal()">
+                            <select class="w-1/4 p-2 border rounded-lg unit text-xs font-bold" onchange="updateTotal()">
                                 ${p.units.map(u => `<option value="${u}">${u}</option>`).join('')}
                             </select>
-                        </div>
-                    `).join(''));
+                        </div>`).join(''));
                 </script>
             </div>
         </div>
 
         <div class="card bg-blue-50 border border-blue-100">
-            <div class="flex justify-between items-center mb-2">
-                <span class="font-bold text-blue-800">एकूण बिल:</span>
-                <span id="displayTotal" class="text-xl font-black text-blue-900">₹ 0.00</span>
+            <div class="flex justify-between items-center mb-1">
+                <span class="font-bold text-blue-800 text-sm">एकूण (मूळ):</span>
+                <span id="subTotal" class="font-bold">₹ 0.00</span>
+            </div>
+            <div id="discountInfo" class="flex justify-between items-center mb-2 text-green-600 font-bold text-sm hidden">
+                <span id="couponText">डिस्काउंट:</span>
+                <span id="discountAmt">- ₹ 0.00</span>
+            </div>
+            <div class="flex justify-between items-center border-t pt-2 mb-3">
+                <span class="font-black text-blue-900">फायनल बिल:</span>
+                <span id="finalTotal" class="text-2xl font-black text-blue-900">₹ 0.00</span>
             </div>
             <input type="text" id="coupon" placeholder="कूपन कोड टाका" class="w-full p-2 border rounded-lg text-center font-bold uppercase" oninput="updateTotal()">
         </div>
 
         <div class="card space-y-3">
-            <input type="text" id="cust_name" placeholder="तुमचे नाव (अनिवार्य)" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
-            <input type="number" id="cust_phone" placeholder="मोबाईल नंबर (अनिवार्य)" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
-            <textarea id="cust_loc" placeholder="पूर्ण पत्ता" class="w-full p-3 border rounded-xl outline-none"></textarea>
+            <input type="text" id="cust_name" placeholder="तुमचे नाव (आवश्यक)" class="w-full p-3 border rounded-xl outline-none">
+            <input type="number" id="cust_phone" placeholder="मोबाईल नंबर (आवश्यक)" class="w-full p-3 border rounded-xl outline-none">
+            <textarea id="cust_loc" placeholder="पत्ता" class="w-full p-3 border rounded-xl outline-none"></textarea>
         </div>
 
-        <button id="orderBtn" onclick="placeOrder()" class="btn-primary py-4 shadow-xl">🚀 ऑर्डर कन्फर्म करा</button>
+        <button id="orderBtn" onclick="placeOrder()" class="btn-primary py-4 shadow-xl">🚀 ऑर्डर आणि WhatsApp</button>
     </div>
 
     <div id="trackView" class="hidden">
         <div class="card space-y-4">
-            <h2 class="font-bold text-blue-800">ऑर्डर स्टेटस तपासा</h2>
+            <h2 class="font-bold text-blue-800 border-b pb-2">ऑर्डर स्टेटस</h2>
             <input type="text" id="trackId" placeholder="Order ID (उदा. V-1234)" class="w-full p-3 border rounded-xl">
             <input type="number" id="trackPhone" placeholder="रजिस्टर्ड मोबाईल नंबर" class="w-full p-3 border rounded-xl">
-            <button onclick="trackMyOrder()" class="btn-primary bg-green-600 py-3">माहिती शोधा</button>
+            <button onclick="trackMyOrder()" class="btn-primary bg-green-600 py-3 text-white">माहिती शोधा</button>
         </div>
         <div id="trackResult" class="card hidden bg-yellow-50 border border-yellow-200"></div>
     </div>
 
-    <div id="adminView" class="hidden text-center p-8 card border-2 border-blue-500">
-        <h2 class="font-bold text-xl mb-4">Admin Dashboard</h2>
-        <a id="sheetLink" href="#" target="_blank" class="block bg-black text-white p-4 rounded-xl mb-4 font-bold">📊 Sheet उघडा</a>
+    <div id="adminView" class="hidden text-center p-8 card border-2 border-blue-600">
+        <h2 class="font-bold text-xl mb-4">मालक डॅशबोर्ड</h2>
+        <a id="sheetLink" href="#" target="_blank" class="block bg-black text-white p-4 rounded-xl mb-4 font-bold">📊 सर्व ऑर्डर्स पहा</a>
         <button onclick="location.reload()" class="underline text-gray-500">Logout</button>
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwYCtl_moKBf44WBRHczCCcZalibpJj0G_QlSeBuluQSbYR5C7sKzJq5Dr5zdon_9th/exec'; 
+        // खालील २ गोष्टी बदला
+        const scriptURL = 'येथे_तुमची_नवीन_APPS_SCRIPT_URL_टाका'; 
         const myWhatsApp = '918805223290';
-        const mySheetLink = 'https://docs.google.com/spreadsheets/u/0/d/1616EczZGBg1gpj83v4GkQUm3IAvLmhTX2VqBinKnjzo/htmlview';
+        const mySheetLink = 'येथे_तुमची_SHEET_LINK_टाका';
         
-        let baseRates = {}; 
+        let settings = { rates: {}, coupons: {} };
 
-        async function fetchRates() {
+        async function fetchSettings() {
             try {
-                const response = await fetch(scriptURL);
-                baseRates = await response.json();
-                document.getElementById('rateStatus').innerText = "✅ दर अपडेट झाले";
+                const response = await fetch(`${scriptURL}?action=getSettings`);
+                settings = await response.json();
+                document.getElementById('rateStatus').innerText = "✅ सिस्टीम तयार आहे";
                 document.getElementById('rateStatus').style.color = "#4ade80";
-            } catch (e) { document.getElementById('rateStatus').innerText = "❌ दर लोड झाले नाहीत"; }
+            } catch (e) { document.getElementById('rateStatus').innerText = "❌ सर्व्हर एरर!"; }
         }
 
         function switchTab(tab) {
-            const shop = document.getElementById('customerView'), track = document.getElementById('trackView');
-            const sTab = document.getElementById('shopTab'), tTab = document.getElementById('trackTab');
-            if(tab === 'shop') {
-                shop.classList.remove('hidden'); track.classList.add('hidden');
-                sTab.classList.add('tab-active'); tTab.classList.remove('tab-active');
-            } else {
-                shop.classList.add('hidden'); track.classList.remove('hidden');
-                sTab.classList.remove('tab-active'); tTab.classList.add('tab-active');
-            }
+            document.getElementById('customerView').classList.toggle('hidden', tab !== 'shop');
+            document.getElementById('trackView').classList.toggle('hidden', tab === 'shop');
+            document.getElementById('shopTab').classList.toggle('tab-active', tab === 'shop');
+            document.getElementById('trackTab').classList.toggle('tab-active', tab !== 'shop');
         }
 
         function updateTotal() {
-            let total = 0;
+            let subtotal = 0;
             document.querySelectorAll('.qty').forEach((q, i) => {
                 let val = parseFloat(q.value) || 0;
                 let unit = document.querySelectorAll('.unit')[i].value;
-                let rate = baseRates[q.dataset.name] || 0;
+                let rate = settings.rates[q.dataset.name] || 0;
                 if (unit === "gm" || unit === "ml") val /= 1000;
-                total += (val * rate);
+                subtotal += (val * rate);
             });
-            document.getElementById('displayTotal').innerText = "₹ " + total.toFixed(2);
+
+            let couponCode = document.getElementById('coupon').value.toUpperCase();
+            let discountPercent = settings.coupons[couponCode] || 0;
+            let discountAmt = (subtotal * discountPercent) / 100;
+            let final = subtotal - discountAmt;
+
+            document.getElementById('subTotal').innerText = "₹ " + subtotal.toFixed(2);
+            document.getElementById('finalTotal').innerText = "₹ " + final.toFixed(2);
+            
+            const discDiv = document.getElementById('discountInfo');
+            if(discountPercent > 0) {
+                discDiv.classList.remove('hidden');
+                document.getElementById('couponText').innerText = `डिस्काउंट (${discountPercent}%):`;
+                document.getElementById('discountAmt').innerText = `- ₹ ${discountAmt.toFixed(2)}`;
+            } else { discDiv.classList.add('hidden'); }
         }
 
         async function placeOrder() {
             const name = document.getElementById('cust_name').value.trim();
             const phone = document.getElementById('cust_phone').value.trim();
+            const loc = document.getElementById('cust_loc').value.trim();
+            
             if(!name || phone.length < 10) return alert("नाव आणि नंबर आवश्यक आहे!");
 
-            let items = []; let summary = [];
+            let summary = [];
             document.querySelectorAll('.qty').forEach((q, i) => {
-                if(parseFloat(q.value) > 0) {
-                    let unit = document.querySelectorAll('.unit')[i].value;
-                    items.push({name: q.dataset.name, qty: q.value, unit: unit});
-                    summary.push(`${q.dataset.name}: ${q.value}${unit}`);
-                }
+                if(parseFloat(q.value) > 0) summary.push(`${q.dataset.name}: ${q.value}${document.querySelectorAll('.unit')[i].value}`);
             });
 
-            if(items.length === 0) return alert("किमान १ तरी उत्पादन निवडा!");
+            if(summary.length === 0) return alert("कृपया वस्तू निवडा!");
+
+            const orderID = "V-" + Math.floor(1000 + Math.random() * 9000);
+            const finalBill = document.getElementById('finalTotal').innerText;
 
             const data = {
-                orderID: "V-" + Math.floor(1000 + Math.random() * 9000),
-                name: name, phone: phone, location: document.getElementById('cust_loc').value,
+                orderID: orderID, name: name, phone: phone, location: loc,
                 coupon: document.getElementById('coupon').value,
-                itemsSummary: summary.join(", "), itemsList: items
+                itemsSummary: summary.join(", "), finalBill: finalBill
             };
 
+            const orderBtn = document.getElementById('orderBtn');
+            orderBtn.disabled = true; orderBtn.innerText = "Processing...";
+
+            // १. गुगल शीटला पाठवणे
             await fetch(scriptURL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(data)});
-            let msg = `*नवीन ऑर्डर - विश्वम डेअरी*%0AID: ${data.orderID}%0Aनाव: ${data.name}%0Aऑर्डर: ${data.itemsSummary}%0Aबिल: ${document.getElementById('displayTotal').innerText}`;
-            window.open(`https://wa.me/${myWhatsApp}?text=${encodeURIComponent(msg)}`);
-            location.reload();
+            
+            // २. व्हॉट्सॲप मेसेज तयार करणे
+            let msg = `*नवीन ऑर्डर - विश्वम डेअरी*%0A--------------------------%0A*ID:* ${orderID}%0A*नाव:* ${data.name}%0A*ऑर्डर:* ${data.itemsSummary}%0A--------------------------%0A*एकूण बिल: ${finalBill}*%0A--------------------------%0A*पत्ता:* ${data.location}%0A--------------------------%0A_धन्यवाद!_`;
+            
+            window.open(`https://wa.me/${myWhatsApp}?text=${msg}`);
+            setTimeout(() => { location.reload(); }, 2000);
         }
 
         async function trackMyOrder() {
@@ -161,35 +185,24 @@
             resDiv.innerHTML = "शोधत आहे..."; resDiv.classList.remove('hidden');
 
             const response = await fetch(`${scriptURL}?action=track&id=${id}&phone=${phone}`);
-            const result = await response.json();
+            const res = await response.json();
 
-            if(result.status === "found") {
-                resDiv.innerHTML = `
-                    <p class="font-bold text-blue-800">ऑर्डर सापडली!</p>
+            if(res.status === "found") {
+                resDiv.innerHTML = `<p class="font-bold text-blue-800">ऑर्डर सापडली!</p>
                     <div class="text-sm mt-2 space-y-1">
-                        <p><b>नाव:</b> ${result.data.name}</p>
-                        <p><b>ऑर्डर:</b> ${result.data.items}</p>
-                        <p><b>बिल:</b> ₹ ${result.data.bill}</p>
-                        <p><b>पत्ता:</b> ${result.data.location}</p>
-                    </div>
-                    <p class="text-[10px] mt-3 text-red-500">*बदल करण्यासाठी व्हॉट्सॲपवर संपर्क करा.</p>`;
-            } else { resDiv.innerHTML = "❌ माहिती सापडली नाही."; }
+                        <p><b>नाव:</b> ${res.data.name}</p>
+                        <p><b>ऑर्डर:</b> ${res.data.items}</p>
+                        <p><b>बिल:</b> ${res.data.bill}</p>
+                        <p><b>पत्ता:</b> ${res.data.location}</p>
+                    </div>`;
+            } else { resDiv.innerHTML = "❌ माहिती सापडली नाही. ID आणि मोबाईल नंबर तपासा."; }
         }
 
         let clicks = 0;
-        function adminTouch() {
-            clicks++;
-            if(clicks === 5) {
-                if(prompt("Pass:") === "1234") {
-                    document.getElementById('customerView').classList.add('hidden');
-                    document.getElementById('adminView').classList.remove('hidden');
-                }
-            }
-            setTimeout(() => { clicks = 0; }, 2000);
-        }
+        function adminTouch() { clicks++; if(clicks === 5) { if(prompt("Password:") === "1234") { document.getElementById('customerView').classList.add('hidden'); document.getElementById('trackView').classList.add('hidden'); document.getElementById('adminView').classList.remove('hidden'); } } setTimeout(() => { clicks = 0; }, 2000); }
 
         document.getElementById('sheetLink').href = mySheetLink;
-        fetchRates();
+        fetchSettings();
     </script>
 </body>
 </html>
