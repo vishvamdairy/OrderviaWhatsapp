@@ -14,21 +14,21 @@
         .tab-active { background: #1e40af; color: white; border-radius: 10px; }
     </style>
 </head>
-<body class="p-4">
+<body class="p-4 pb-10">
 
-    <div class="bg-blue-800 text-white p-6 rounded-2xl text-center mb-4 shadow-lg" onclick="adminTouch()">
-        <h1 class="text-2xl font-black">VISHVAM DAIRY</h1>
-        <p id="rateStatus" class="text-[10px] font-bold text-yellow-400 uppercase">दर लोड होत आहेत...</p>
+    <div class="bg-blue-800 text-white p-6 rounded-2xl text-center mb-4" onclick="adminTouch()">
+        <h1 class="text-2xl font-black italic">VISHVAM DAIRY</h1>
+        <p id="rateStatus" class="text-[10px] font-bold text-yellow-400">CONNECTING TO SERVER...</p>
     </div>
 
-    <div class="flex mb-4 bg-white rounded-xl p-1 shadow-sm border">
+    <div class="flex mb-4 bg-white rounded-xl p-1 shadow-sm">
         <button id="shopTab" onclick="switchTab('shop')" class="tab-btn tab-active">🛒 ऑर्डर</button>
         <button id="trackTab" onclick="switchTab('track')" class="tab-btn">🔍 ट्रॅक</button>
     </div>
 
     <div id="customerView">
         <div class="card">
-            <h2 class="font-bold text-gray-700 mb-4 border-b pb-2">उत्पादने निवडा</h2>
+            <h2 class="font-bold text-gray-700 mb-4 border-b pb-2 text-sm">प्रॉडक्ट निवडा</h2>
             <div id="itemsList" class="space-y-4">
                 <script>
                     const products = [
@@ -41,9 +41,9 @@
                     ];
                     document.write(products.map(p => `
                         <div class="flex items-center gap-2 border-b border-gray-50 pb-2">
-                            <span class="w-1/3 text-sm font-bold">${p.name}</span>
-                            <input type="number" class="w-1/4 p-2 border rounded-lg qty bg-gray-50" data-name="${p.name}" placeholder="0" oninput="updateTotal()">
-                            <select class="w-1/4 p-2 border rounded-lg unit text-xs font-bold" onchange="updateTotal()">
+                            <span class="w-1/3 text-[13px] font-bold">${p.name}</span>
+                            <input type="number" class="w-1/4 p-2 border rounded qty bg-gray-50" data-name="${p.name}" placeholder="0" oninput="updateTotal()">
+                            <select class="w-1/4 p-2 border rounded unit text-xs font-bold" onchange="updateTotal()">
                                 ${p.units.map(u => `<option value="${u}">${u}</option>`).join('')}
                             </select>
                         </div>`).join(''));
@@ -52,24 +52,22 @@
         </div>
 
         <div class="card bg-blue-50 border border-blue-100">
-            <div class="flex justify-between items-center mb-1">
-                <span class="font-bold text-blue-800 text-sm">एकूण (मूळ):</span>
-                <span id="subTotal" class="font-bold">₹ 0.00</span>
+            <div class="flex justify-between items-center mb-1 text-xs">
+                <span>एकूण (मूळ):</span> <span id="subTotal">₹ 0.00</span>
             </div>
-            <div id="discountInfo" class="flex justify-between items-center mb-2 text-green-600 font-bold text-sm hidden">
-                <span id="couponText">डिस्काउंट:</span>
-                <span id="discountAmt">- ₹ 0.00</span>
+            <div id="discountInfo" class="flex justify-between items-center mb-2 text-green-600 font-bold text-xs hidden">
+                <span id="couponText">डिस्काउंट:</span> <span id="discountAmt">- ₹ 0.00</span>
             </div>
-            <div class="flex justify-between items-center border-t pt-2 mb-3">
+            <div class="flex justify-between items-center border-t pt-2">
                 <span class="font-black text-blue-900">फायनल बिल:</span>
                 <span id="finalTotal" class="text-2xl font-black text-blue-900">₹ 0.00</span>
             </div>
-            <input type="text" id="coupon" placeholder="कूपन कोड टाका" class="w-full p-2 border rounded-lg text-center font-bold uppercase" oninput="updateTotal()">
+            <input type="text" id="coupon" placeholder="कूपन कोड" class="w-full mt-3 p-2 border rounded text-center font-bold uppercase" oninput="updateTotal()">
         </div>
 
         <div class="card space-y-3">
-            <input type="text" id="cust_name" placeholder="तुमचे नाव (आवश्यक)" class="w-full p-3 border rounded-xl outline-none">
-            <input type="number" id="cust_phone" placeholder="मोबाईल नंबर (आवश्यक)" class="w-full p-3 border rounded-xl outline-none">
+            <input type="text" id="cust_name" placeholder="नाव" class="w-full p-3 border rounded-xl outline-none">
+            <input type="number" id="cust_phone" placeholder="मोबाईल नंबर" class="w-full p-3 border rounded-xl outline-none">
             <textarea id="cust_loc" placeholder="पत्ता" class="w-full p-3 border rounded-xl outline-none"></textarea>
         </div>
 
@@ -77,36 +75,40 @@
     </div>
 
     <div id="trackView" class="hidden">
-        <div class="card space-y-4">
-            <h2 class="font-bold text-blue-800 border-b pb-2">ऑर्डर स्टेटस</h2>
+        <div class="card space-y-4 text-center">
             <input type="text" id="trackId" placeholder="Order ID (उदा. V-1234)" class="w-full p-3 border rounded-xl">
-            <input type="number" id="trackPhone" placeholder="रजिस्टर्ड मोबाईल नंबर" class="w-full p-3 border rounded-xl">
-            <button onclick="trackMyOrder()" class="btn-primary bg-green-600 py-3 text-white">माहिती शोधा</button>
+            <input type="number" id="trackPhone" placeholder="मोबाईल नंबर" class="w-full p-3 border rounded-xl">
+            <button onclick="trackMyOrder()" class="btn-primary bg-green-600">तपासा</button>
+            <div id="trackResult" class="mt-4 text-left p-3 rounded-lg hidden"></div>
         </div>
-        <div id="trackResult" class="card hidden bg-yellow-50 border border-yellow-200"></div>
     </div>
 
     <div id="adminView" class="hidden text-center p-8 card border-2 border-blue-600">
-        <h2 class="font-bold text-xl mb-4">मालक डॅशबोर्ड</h2>
-        <a id="sheetLink" href="#" target="_blank" class="block bg-black text-white p-4 rounded-xl mb-4 font-bold">📊 सर्व ऑर्डर्स पहा</a>
-        <button onclick="location.reload()" class="underline text-gray-500">Logout</button>
+        <a id="sheetLink" href="#" target="_blank" class="block bg-black text-white p-4 rounded-xl font-bold">📊 उघडा SHEET</a>
+        <button onclick="location.reload()" class="mt-4 underline text-gray-500">बाहेर पडा</button>
     </div>
 
     <script>
-        // खालील २ गोष्टी बदला
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzKNfwpNYxm7v_FkSAVD-aVk-kSaKD_A5XXKBM8-FkswSOWCP3New1zRUiUreek3qIdvQ/exec'; 
+        // --- फक्त या २ गोष्टी नीट टाका ---
+        const scriptURL = 'येथे_तुमची_नवीन_DEPLOYED_URL_टाका'; 
         const myWhatsApp = '918805223290';
-        const mySheetLink = 'https://docs.google.com/spreadsheets/u/0/d/1616EczZGBg1gpj83v4GkQUm3IAvLmhTX2VqBinKnjzo/htmlview';
+        const mySheetLink = 'येथे_Sheet_Link_टाका';
         
         let settings = { rates: {}, coupons: {} };
 
         async function fetchSettings() {
             try {
-                const response = await fetch(`${scriptURL}?action=getSettings`);
-                settings = await response.json();
-                document.getElementById('rateStatus').innerText = "✅ सिस्टीम तयार आहे";
-                document.getElementById('rateStatus').style.color = "#4ade80";
-            } catch (e) { document.getElementById('rateStatus').innerText = "❌ सर्व्हर एरर!"; }
+                const response = await fetch(scriptURL); // Default doGet
+                const data = await response.json();
+                if(data.rates) {
+                    settings = data;
+                    document.getElementById('rateStatus').innerText = "✅ सिस्टीम ऑनलाईन";
+                    document.getElementById('rateStatus').style.color = "#4ade80";
+                } else { throw new Error(); }
+            } catch (e) {
+                document.getElementById('rateStatus').innerText = "⚠️ सर्व्हरशी संपर्क होत नाहीये";
+                document.getElementById('rateStatus').style.color = "#f87171";
+            }
         }
 
         function switchTab(tab) {
@@ -145,37 +147,33 @@
         async function placeOrder() {
             const name = document.getElementById('cust_name').value.trim();
             const phone = document.getElementById('cust_phone').value.trim();
-            const loc = document.getElementById('cust_loc').value.trim();
-            
-            if(!name || phone.length < 10) return alert("नाव आणि नंबर आवश्यक आहे!");
+            if(!name || phone.length < 10) return alert("नाव आणि नंबर आवश्यक!");
 
             let summary = [];
             document.querySelectorAll('.qty').forEach((q, i) => {
                 if(parseFloat(q.value) > 0) summary.push(`${q.dataset.name}: ${q.value}${document.querySelectorAll('.unit')[i].value}`);
             });
 
-            if(summary.length === 0) return alert("कृपया वस्तू निवडा!");
+            if(summary.length === 0) return alert("वस्तू निवडा!");
 
             const orderID = "V-" + Math.floor(1000 + Math.random() * 9000);
             const finalBill = document.getElementById('finalTotal').innerText;
 
             const data = {
-                orderID: orderID, name: name, phone: phone, location: loc,
+                orderID: orderID, name: name, phone: phone, location: document.getElementById('cust_loc').value,
                 coupon: document.getElementById('coupon').value,
                 itemsSummary: summary.join(", "), finalBill: finalBill
             };
 
             const orderBtn = document.getElementById('orderBtn');
-            orderBtn.disabled = true; orderBtn.innerText = "Processing...";
+            orderBtn.disabled = true; orderBtn.innerText = "प्रोसेस होत आहे...";
 
-            // १. गुगल शीटला पाठवणे
-            await fetch(scriptURL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(data)});
-            
-            // २. व्हॉट्सॲप मेसेज तयार करणे
-            let msg = `*नवीन ऑर्डर - विश्वम डेअरी*%0A--------------------------%0A*ID:* ${orderID}%0A*नाव:* ${data.name}%0A*ऑर्डर:* ${data.itemsSummary}%0A--------------------------%0A*एकूण बिल: ${finalBill}*%0A--------------------------%0A*पत्ता:* ${data.location}%0A--------------------------%0A_धन्यवाद!_`;
-            
-            window.open(`https://wa.me/${myWhatsApp}?text=${msg}`);
-            setTimeout(() => { location.reload(); }, 2000);
+            try {
+                await fetch(scriptURL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(data)});
+                let msg = `*नवीन ऑर्डर - विश्वम डेअरी*%0A--------------------------%0A*ID:* ${orderID}%0A*नाव:* ${data.name}%0A*ऑर्डर:* ${data.itemsSummary}%0A--------------------------%0A*बिल: ${finalBill}*%0A--------------------------%0A*पत्ता:* ${data.location}`;
+                window.open(`https://wa.me/${myWhatsApp}?text=${msg}`);
+                location.reload();
+            } catch(e) { alert("काहीतरी चूक झाली!"); orderBtn.disabled = false; }
         }
 
         async function trackMyOrder() {
@@ -183,24 +181,18 @@
             const phone = document.getElementById('trackPhone').value;
             const resDiv = document.getElementById('trackResult');
             resDiv.innerHTML = "शोधत आहे..."; resDiv.classList.remove('hidden');
-
-            const response = await fetch(`${scriptURL}?action=track&id=${id}&phone=${phone}`);
-            const res = await response.json();
-
-            if(res.status === "found") {
-                resDiv.innerHTML = `<p class="font-bold text-blue-800">ऑर्डर सापडली!</p>
-                    <div class="text-sm mt-2 space-y-1">
-                        <p><b>नाव:</b> ${res.data.name}</p>
-                        <p><b>ऑर्डर:</b> ${res.data.items}</p>
-                        <p><b>बिल:</b> ${res.data.bill}</p>
-                        <p><b>पत्ता:</b> ${res.data.location}</p>
-                    </div>`;
-            } else { resDiv.innerHTML = "❌ माहिती सापडली नाही. ID आणि मोबाईल नंबर तपासा."; }
+            try {
+                const response = await fetch(`${scriptURL}?action=track&id=${id}&phone=${phone}`);
+                const res = await response.json();
+                if(res.status === "found") {
+                    resDiv.className = "mt-4 text-left p-4 rounded-xl bg-blue-50 border border-blue-100 block";
+                    resDiv.innerHTML = `<p><b>नाव:</b> ${res.data.name}</p><p><b>ऑर्डर:</b> ${res.data.items}</p><p><b>बिल:</b> ${res.data.bill}</p>`;
+                } else { resDiv.innerHTML = "❌ माहिती सापडली नाही."; }
+            } catch(e) { resDiv.innerHTML = "❌ सर्व्हर एरर!"; }
         }
 
         let clicks = 0;
-        function adminTouch() { clicks++; if(clicks === 5) { if(prompt("Password:") === "1234") { document.getElementById('customerView').classList.add('hidden'); document.getElementById('trackView').classList.add('hidden'); document.getElementById('adminView').classList.remove('hidden'); } } setTimeout(() => { clicks = 0; }, 2000); }
-
+        function adminTouch() { clicks++; if(clicks === 5) { if(prompt("Pass:") === "1234") { document.getElementById('customerView').classList.add('hidden'); document.getElementById('adminView').classList.remove('hidden'); } } setTimeout(() => { clicks = 0; }, 2000); }
         document.getElementById('sheetLink').href = mySheetLink;
         fetchSettings();
     </script>
